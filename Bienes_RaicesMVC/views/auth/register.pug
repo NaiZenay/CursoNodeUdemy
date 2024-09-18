@@ -8,14 +8,14 @@ block contenido
 
     .mt-8.mx-auto.max-w-md
         .bg.white.py-8.px-4.shadow 
-            form.space-y-5(action="")
+            form.space-y-5(method="POST" action="/register")
                 div 
                     label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="nombre") Tu nombre 
                     input#nombre.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Tu nombre" type="text" name="nombre")
 
                 div 
                     label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="email") Email de registro
-                    input#email.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Tu email" type="email" name="nombre")
+                    input#email.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Tu email" type="email" name="email")
 
                 div 
                     label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="password") Password
@@ -23,7 +23,7 @@ block contenido
 
                 div 
                     label.block.text-sm.uppercase.text-gray-500.mb-2.font-bold(for="repetir-password") Repite tu Password
-                    input#repite-password.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Repite tu Password" type="password" name="password")
+                    input#repite-password.w-full.px-3.py-2.border.border-gray-300.rounded-md.placeholder-gray-400(placeholder="Repite tu Password" type="password" name="repetir-password")
 
                 div.flex.items-center.justify-between
                     a.text-gray-500.text-xs(href="login") Ya tienes Cuenta? Inicia Sesion

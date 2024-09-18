@@ -1,13 +1,20 @@
+import User from "../models/User.js"
+
 const formLogin = (req, res) => {
     res.render('auth/login', {
         pagina: "Iniciar Sesion"
     })//accede a la ruta y usa el templete engine configurado
 }
 
-const register = (req, res) => {
+const registerForm = (req, res) => {
     res.render('auth/register', {
         pagina: "Crear Cuenta"
     })
+}
+
+const register = async(req, res) => {
+    const user=await User.create(req.body);
+    res.json=user
 }
 
 const forgot_Password = (req, res) => {
@@ -16,5 +23,5 @@ const forgot_Password = (req, res) => {
     })
 }
 export {
-    formLogin, register,forgot_Password
+    formLogin, register, registerForm, forgot_Password
 }

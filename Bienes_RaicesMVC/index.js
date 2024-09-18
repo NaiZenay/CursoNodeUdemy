@@ -6,9 +6,12 @@ import db from "./config/db.js"
 // crear la app 
 const app = express();
 
+//Lecttura de forms
+app.use(express.urlencoded({extended:true}));
 //conexion db
 try{
     await db.authenticate();
+    db.sync()
     console.log("conexion corrcta")
 }catch(error){
     console.log(error)
