@@ -1,5 +1,5 @@
 import express from 'express';
-import { formLogin,register } from '../controllers/user.controller.js';
+import { formLogin,register,forgot_Password } from '../controllers/user.controller.js';
 const router = express();
 
 router.get('/',function (request,response){
@@ -11,6 +11,9 @@ router.route('/login')
 
 router.route('/register')
 .get(register)
+
+router.route('/forgotPassword')
+.get(forgot_Password)
 
 
 

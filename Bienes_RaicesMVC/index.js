@@ -1,9 +1,18 @@
 //const express=require('express'); common js
 import express from 'express';
 import router from './routes/userRoutes.js';
+import db from "./config/db.js"
 
 // crear la app 
 const app = express();
+
+//conexion db
+try{
+    await db.authenticate();
+    console.log("conexion corrcta")
+}catch(error){
+    console.log(error)
+}
 
 //configuraciones del proyecto
 app.set('view engine','pug');//configuracion del template engine

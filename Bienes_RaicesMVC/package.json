@@ -8,7 +8,7 @@
     "start": "node ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon index.js",
-    "css":"postcss public/css/tailwind.css -o public/css/app.css"
+    "css": "postcss public/css/tailwind.css -o public/css/app.css --watch"
   },
   "keywords": [
     "MVC",
@@ -26,7 +26,10 @@
     "tailwindcss": "^3.4.11"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.20.0",
-    "pug": "^3.0.3"
+    "mysql2": "^3.11.3",
+    "pug": "^3.0.3",
+    "sequelize": "^6.37.3"
   }
 }
