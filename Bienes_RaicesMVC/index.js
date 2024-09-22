@@ -1,13 +1,24 @@
+//configuracion del proyecto 
+
+
 //const express=require('express'); common js
 import express from 'express';
 import router from './routes/userRoutes.js';
 import db from "./config/db.js"
+import csurf from 'csurf';
+import cookieParser from 'cookie-parser';
+import { cookie } from 'express-validator';
 
 // crear la app 
 const app = express();
 
 //Lecttura de forms
 app.use(express.urlencoded({extended:true}));
+
+//habilitar parser
+app.use(cookieParser())
+app.use(csurf({cookie:true}))
+
 //conexion db
 try{
     await db.authenticate();
