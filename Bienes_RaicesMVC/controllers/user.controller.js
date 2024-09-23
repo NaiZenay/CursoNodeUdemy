@@ -1,14 +1,12 @@
 import User from "../models/User.js"
 import { check, validationResult } from "express-validator"
-import generateToken from "../helpers/tokens.js"
+import {generateToken,generateJWT} from "../helpers/tokens.js"
 import { emailRegister, emailForgotPassword } from "../helpers/emails.js"
-import csrf from "csrf"
-import { where } from "sequelize"
 import bcrypt from "bcrypt"
-
 const formLogin = (req, res) => {
     res.render('auth/login', {
-        pagina: "Iniciar Sesion"
+        pagina: "Iniciar Sesion",
+        csrfToken: req.csrfToken(),
     })//accede a la ruta y usa el templete engine configurado
 }
 
@@ -43,7 +41,6 @@ const register = async (req, res) => {
 
     //verificar usario registrado
     const userExist = await User.findOne({ where: { email } })
-    console.log(userExist)
 
     if ((userExist)) {
         return res.render("auth/register", {
@@ -92,7 +89,7 @@ const verify = async (req, res) => {
 
     // Confirmación de la cuenta
     userExist.token = null; // Eliminar el token después de usarlo
-    userExist.confirmado = true; // Marca la cuenta como confirmada
+    userExist.verified = true; // Marca la cuenta como confirmada
     await userExist.save();
 
     res.render("auth/verify-account", {
@@ -182,11 +179,11 @@ const newPassword = async (req, res) => {
 
     const user = await User.findOne({ where: { token } })
 
-    const salt=await bcrypt.genSalt(10)
+    const salt = await bcrypt.genSalt(10)
 
-    user.password=await bcrypt.hash(password,salt);
-    user.token=null;
-    
+    user.password = await bcrypt.hash(password, salt);
+    user.token = null;
+
     await user.save();
     return res.render("auth/verify-account", {
         pagina: "Contraseña Restablecida",
@@ -194,8 +191,60 @@ const newPassword = async (req, res) => {
     });
 }
 
+const login = async (req, res) => {
+    await check("email").isEmail().withMessage("Eso no es un email").run(req)
+    await check("password").notEmpty().withMessage("El password es obligatorio").run(req)
+
+    let result = validationResult(req)
+
+    if (!(result.isEmpty())) {
+        return res.render("auth/login", {
+            pagina: "Iniciar Sesion",
+            csrfToken: req.csrfToken(),
+            errores: result.array(),
+            userInfo: {
+                name: req.body.name,
+                email: req.body.email
+            }
+        })
+    }
+
+    const { email, password } = req.body
+
+    const user = await User.findOne({ where: { email } })
+
+    if (!user) {
+        return res.render("auth/login", {
+            pagina: "Iniciar Sesion",
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: "El usuario no existe" }],
+        })
+    }
+
+    if (!user.verified) {
+        return res.render("auth/login", {
+            pagina: "Iniciar Sesion",
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: "El usuario no esta verificado" }],
+        })
+    }
+
+    if (!(user.verifyPassword(password))) {
+        return res.render("auth/login", {
+            pagina: "Iniciar Sesion",
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: "Contraseña incorrecta" }],
+        })
+    }
+
+    const token = generateJWT(user.id)
+    return res.cookie("_token",token,{
+        httpOnly:true
+    }).redirect("/")
+}
+
 
 
 export {
-    formLogin, register, registerForm, forgot_Password, verify, resetPassword, newPassword, verifyToken
+    formLogin, register, registerForm, forgot_Password, verify, resetPassword, newPassword, verifyToken, login
 }

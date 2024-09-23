@@ -7,7 +7,6 @@ import router from './routes/userRoutes.js';
 import db from "./config/db.js"
 import csurf from 'csurf';
 import cookieParser from 'cookie-parser';
-import { cookie } from 'express-validator';
 
 // crear la app 
 const app = express();

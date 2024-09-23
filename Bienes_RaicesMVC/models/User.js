@@ -37,4 +37,8 @@ const User=db.define("usuarios",{//definicipn de tabla
 })
 
 
+User.prototype.verifyPassword= function(password){
+    return bcrypt.compareSync(password,this.password);
+}
+
 export default User;
