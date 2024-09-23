@@ -1,8 +1,10 @@
 import User from "../models/User.js"
 import { check, validationResult } from "express-validator"
 import generateToken from "../helpers/tokens.js"
-import emailRegister from "../helpers/emails.js"
-import csurf from "csurf"
+import { emailRegister, emailForgotPassword } from "../helpers/emails.js"
+import csrf from "csrf"
+import { where } from "sequelize"
+import bcrypt from "bcrypt"
 
 const formLogin = (req, res) => {
     res.render('auth/login', {
@@ -13,7 +15,7 @@ const formLogin = (req, res) => {
 const registerForm = (req, res) => {
     res.render('auth/register', {
         pagina: "Crear Cuenta",
-        csurfToken: req.csurfToken()
+        csrfToken: req.csrfToken()
     })
 }
 
@@ -29,7 +31,7 @@ const register = async (req, res) => {
     if (!(result.isEmpty())) {
         return res.render("auth/register", {
             pagina: "Crea Cuenta",
-            csurfToken: req.csurfToken(),
+            csrfToken: req.csrfToken(),
             errores: result.array(),
             userInfo: {
                 name: req.body.name,
@@ -103,9 +105,97 @@ const verify = async (req, res) => {
 
 const forgot_Password = (req, res) => {
     res.render('auth/forgotPassword', {
-        pagina: "Olvide mi contraseña"
+        csrfToken: req.csrfToken(),
+        pagina: "Olvide mi contraseña",
     })
 }
+
+const resetPassword = async (req, res) => {
+    await check("email").isEmail().withMessage("Eso no es un email").run(req)
+
+    let result = validationResult(req)
+
+    if (!(result.isEmpty())) {
+        return res.render("auth/forgotPassword", {
+            pagina: "Recupera tu acceso",
+            csrfToken: req.csrfToken(),
+            errores: result.array(),
+        })
+    }
+
+    const { email } = req.body;
+    const userExist = await User.findOne({ where: { email } })
+    if (!userExist) {
+        return res.render("auth/forgotPassword", {
+            pagina: "Recupera tu acceso",
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: "El email no esta registrado" }],
+        })
+    }
+
+    userExist.token = generateToken();
+    await userExist.save()
+    emailForgotPassword({
+        email,
+        name: userExist.name,
+        token: userExist.token
+    })
+
+
+    res.render("templates/message", {
+        pagina: "Recupera tu acceso",
+        message: "Enviamos un email con las instrucciones"
+    })
+
+
+}
+
+const verifyToken = async (req, res) => {
+    const { token } = req.params
+    const user = await User.findOne({ where: { token } })
+    if (!user) {
+        return res.render("auth/verify-account", {
+            pagina: "Restablece Constraseña",
+            message: "Error en la validación del token",
+            error: true
+        });
+    }
+    res.render("auth/reset-password", {
+        pagina: "Restablece Constraseña",
+        csrfToken: req.csrfToken(),
+    });
+
+}
+
+const newPassword = async (req, res) => {
+    await check("password").isLength({ min: 6 }).withMessage("El password debe ser de al menos 6 caracteres").run(req)
+    let result = validationResult(req)
+    if (!(result.isEmpty())) {
+        return res.render("auth/reset-password", {
+            pagina: "Restablece tu Contraseña",
+            csrfToken: req.csrfToken(),
+            errores: result.array(),
+        })
+    }
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const user = await User.findOne({ where: { token } })
+
+    const salt=await bcrypt.genSalt(10)
+
+    user.password=await bcrypt.hash(password,salt);
+    user.token=null;
+    
+    await user.save();
+    return res.render("auth/verify-account", {
+        pagina: "Contraseña Restablecida",
+        message: "La contraseña se actualizo correctamente",
+    });
+}
+
+
+
 export {
-    formLogin, register, registerForm, forgot_Password, verify
+    formLogin, register, registerForm, forgot_Password, verify, resetPassword, newPassword, verifyToken
 }

@@ -1,5 +1,5 @@
 import express from 'express';
-import { formLogin,registerForm,register,forgot_Password,verify } from '../controllers/user.controller.js';
+import { formLogin,registerForm,register,forgot_Password,verify,resetPassword,newPassword,verifyToken } from '../controllers/user.controller.js';
 const router = express();
 
 router.get('/',function (request,response){
@@ -7,7 +7,7 @@ router.get('/',function (request,response){
 })
 
 router.route('/login')
-.get(formLogin);
+.get(formLogin)
 
 router.route('/register')
 .get(registerForm)
@@ -15,10 +15,14 @@ router.route('/register')
 
 router.route('/forgotPassword')
 .get(forgot_Password)
+.post(resetPassword)
 
 router.route("/auth/verify/:token")
 .get(verify)
 
+router.route("/auth/forgotPassword/:token")
+.get(verifyToken)
+.post(newPassword)
 
 
 
