@@ -4,6 +4,7 @@
 //const express=require('express'); common js
 import express from 'express';
 import router from './routes/userRoutes.js';
+import PropertoesRouter from './routes/propertiesRoutes.js';
 import db from "./config/db.js"
 import csurf from 'csurf';
 import cookieParser from 'cookie-parser';
@@ -36,6 +37,8 @@ app.use(express.static('public'))
 
 //middleware
 app.use('/',router);
+app.use('/',PropertoesRouter);
+
 
 //puerto de app
 const port=3000;

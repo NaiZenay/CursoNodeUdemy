@@ -240,7 +240,7 @@ const login = async (req, res) => {
     const token = generateJWT(user.id)
     return res.cookie("_token",token,{
         httpOnly:true
-    }).redirect("/")
+    }).redirect("/admin")
 }
 
 
