@@ -7,7 +7,10 @@ html(lang="en")
         link(rel="stylesheet",href="/css/app.css")
 
     body 
-
+        if bar 
+            include header   
 
         main(class="mx-auto container mt-10 px-2")
             block contenido
+        
+        block scripts

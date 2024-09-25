@@ -36,8 +36,8 @@ app.set('views','./views');//configuracion del alamcen de vistas
 app.use(express.static('public'))
 
 //middleware
-app.use('/',router);
-app.use('/',PropertoesRouter);
+app.use('/auth',router);
+app.use('/props',PropertoesRouter);
 
 
 //puerto de app
