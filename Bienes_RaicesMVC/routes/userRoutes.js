@@ -18,10 +18,10 @@ router.route('/forgotPassword')
 .get(forgot_Password)
 .post(resetPassword)
 
-router.route("/auth/verify/:token")
+router.route("/verify/:token")
 .get(verify)
 
-router.route("/auth/forgotPassword/:token")
+router.route("/forgotPassword/:token")
 .get(verifyToken)
 .post(newPassword)
 
