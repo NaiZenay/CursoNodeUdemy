@@ -1,13 +1,13 @@
 import express from "express";
-import {myProperties,create} from "../controllers/properties.controller.js"
+import { myProperties, create, save } from "../controllers/properties.controller.js"
 
-
-const router=express()
+const router = express()
 
 router.route("/admin")
-.get(myProperties)
+    .get(myProperties)
 
 router.route("/create")
-.get(create)
+    .get(create)
+    .post(save)
 
 export default router;
